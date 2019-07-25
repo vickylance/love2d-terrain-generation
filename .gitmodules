@@ -1,0 +1,3 @@
+[submodule "love-9-slice"]
+	path = love-9-slice
+	url = https://github.com/mikufuworks/love-9-slice.git

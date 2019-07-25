@@ -1,11 +1,55 @@
 -- require('perlin')
 
 require('catui')
+local colors = require('colors')
 
 local map = {}
 map.sizeX = 1000
 map.sizeY = 1000
 map.tileSize = 1
+
+map.levels = {
+    {
+        name = 'Deep Water',
+        height = 0.3,
+        color = {20, 27, 122}
+    },
+    {
+        name = 'Shallow Water',
+        height = 0.4,
+        color = {}
+    },
+    {
+        name = 'Sand',
+        height = 0.45,
+        color = {}
+    },
+    {
+        name = 'Grass',
+        height = 0.55,
+        color = {}
+    },
+    {
+        name = 'Forest',
+        height = 0.6,
+        color = {}
+    },
+    {
+        name = 'Rock',
+        height = 0.7,
+        color = {}
+    },
+    {
+        name = 'Steep Rock',
+        height = 0.9,
+        color = {}
+    },
+    {
+        name = 'Snow',
+        height = 1,
+        color = {}
+    }
+}
 
 function mapVal(x_in, in_min, in_max, out_min, out_max)
     return ((x_in - in_min) * (out_max - out_min)) / ((in_max - in_min) + out_min)
@@ -16,7 +60,7 @@ function generateNoiseMap(width, height, seed, scale, octaves, persistance, lacu
         scale = 0.0001
     end
 
-    local rng = love.math.newRandomGenerator( seed )
+    local rng = love.math.newRandomGenerator(seed)
     local ox = rng:random(100000)
     local oy = rng:random(100000)
 
@@ -32,12 +76,12 @@ function generateNoiseMap(width, height, seed, scale, octaves, persistance, lacu
             local noiseHeight = 0
 
             for o = 1, octaves do
-              local sampleX = ((ox + x + rng:random())/ scale) * frequency
-              local sampleY = ((oy + y + rng:random())/ scale) * frequency
-              local noiseVal = (love.math.noise(sampleX, sampleY) * 2) - 1
-              noiseHeight = noiseHeight + (noiseVal * amplitude)
-              amplitude = amplitude * persistance
-              frequency = frequency * lacunarity
+                local sampleX = ((ox + x + rng:random()) / scale) * frequency
+                local sampleY = ((oy + y + rng:random()) / scale) * frequency
+                local noiseVal = (love.math.noise(sampleX, sampleY) * 2) - 1
+                noiseHeight = noiseHeight + (noiseVal * amplitude)
+                amplitude = amplitude * persistance
+                frequency = frequency * lacunarity
             end
 
             if noiseHeight < lowest then
@@ -65,34 +109,34 @@ function lerp(start, ending, amt)
 end
 
 function createButton(btnConfig)
-  local btn = UIButton:new()
-  btn:setPos(btnConfig.x, btnConfig.y)
-  btn:setSize(btnConfig.w, btnConfig.h)
-  btn:setText(btnConfig.text)
-  btn:setAnchor(0, 0)
-  btnConfig.parent:addChild(btn)
-  return btn
+    local btn = UIButton:new()
+    btn:setPos(btnConfig.x, btnConfig.y)
+    btn:setSize(btnConfig.w, btnConfig.h)
+    btn:setText(btnConfig.text)
+    btn:setAnchor(0, 0)
+    btnConfig.parent:addChild(btn)
+    return btn
 end
 
 function createLabel(lblConfig)
-  local lbl = UILabel:new(lblConfig.font or "font/visat.ttf", tostring(lblConfig.text), lblConfig.fontSize or 12)
-  lbl:setPos(lblConfig.x, lblConfig.y)
-  lbl:setSize(lblConfig.w, lblConfig.h)
-  lbl:setText(lblConfig.text)
-  lbl:setAnchor(lblConfig.ax or 0, lblConfig.ay or 0)
-  lbl:setAutoSize(lblConfig.autoSize or false)
-  lbl:setFontColor(lblConfig.fontColor or {1, 1, 1, 1})
-  lblConfig.parent:addChild(lbl)
-  return lbl
+    local lbl = UILabel:new(lblConfig.font or 'font/visat.ttf', tostring(lblConfig.text), lblConfig.fontSize or 12)
+    lbl:setPos(lblConfig.x, lblConfig.y)
+    lbl:setSize(lblConfig.w, lblConfig.h)
+    lbl:setText(lblConfig.text)
+    lbl:setAnchor(lblConfig.ax or 0, lblConfig.ay or 0)
+    lbl:setAutoSize(lblConfig.autoSize or false)
+    lbl:setFontColor(lblConfig.fontColor or {1, 1, 1, 1})
+    lblConfig.parent:addChild(lbl)
+    return lbl
 end
 
 function createInput(inConfig)
-  local inp = UIEditText:new()
-  inp:setPos(inConfig.x, inConfig.y)
-  inp:setSize(inConfig.w, inConfig.h)
-  inp:setText(tostring(inConfig.text))
-  inConfig.parent:addChild(inp)
-  return inp
+    local inp = UIEditText:new()
+    inp:setPos(inConfig.x, inConfig.y)
+    inp:setSize(inConfig.w, inConfig.h)
+    inp:setText(tostring(inConfig.text))
+    inConfig.parent:addChild(inp)
+    return inp
 end
 
 function love.load()
@@ -108,56 +152,74 @@ function love.load()
     mgr.rootCtrl.coreContainer:addChild(content)
 
     local theme = {
-      height = 20
+        height = 20
     }
-    local btnGenerate = createButton({
-      x = 10,
-      y = 50,
-      w = 100,
-      h = theme.height,
-      text = 'Generate',
-      parent = content
-    })
-    local mapConfig = createLabel({
-      x = 10,
-      y = 0,
-      w = 100,
-      h = theme.height,
-      text = "Map Config",
-      parent = content
-    })
-    local mapConfigXLabel = createLabel({
-      x = 10,
-      y = 25,
-      w = 10,
-      h = theme.height,
-      text = "X:",
-      parent = content
-    })
-    local mapConfigX = createInput({
-      x = 35,
-      y = 25,
-      w = 40,
-      h = theme.height,
-      text = map.sizeX,
-      parent = content
-    })
-    local mapConfigYLabel = createLabel({
-      x = 75,
-      y = 25,
-      w = 10,
-      h = theme.height,
-      text = "Y:",
-      parent = content
-    })
-    local mapConfigY = createInput({
-      x = 100,
-      y = 25,
-      w = 40,
-      h = theme.height,
-      text = map.sizeY,
-      parent = content
-    })
+    local btnGenerate =
+        createButton(
+        {
+            x = 10,
+            y = 50,
+            w = 100,
+            h = theme.height,
+            text = 'Generate',
+            parent = content
+        }
+    )
+    local mapConfig =
+        createLabel(
+        {
+            x = 10,
+            y = 0,
+            w = 100,
+            h = theme.height,
+            text = 'Map Config',
+            parent = content
+        }
+    )
+    local mapConfigXLabel =
+        createLabel(
+        {
+            x = 10,
+            y = 25,
+            w = 10,
+            h = theme.height,
+            text = 'X:',
+            parent = content
+        }
+    )
+    local mapConfigX =
+        createInput(
+        {
+            x = 35,
+            y = 25,
+            w = 40,
+            h = theme.height,
+            text = map.sizeX,
+            parent = content
+        }
+    )
+    local mapConfigYLabel =
+        createLabel(
+        {
+            x = 75,
+            y = 25,
+            w = 10,
+            h = theme.height,
+            text = 'Y:',
+            parent = content
+        }
+    )
+    local mapConfigY =
+        createInput(
+        {
+            x = 100,
+            y = 25,
+            w = 40,
+            h = theme.height,
+            text = map.sizeY,
+            parent = content
+        }
+    )
 
     -- local MapEditSizeX = UIEditText:new()
     -- MapEditSizeX:setPos(100, 50)
